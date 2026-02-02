@@ -132,7 +132,7 @@ The API will be available at:
 ### Register a User
 
 ```bash
-curl -X POST "http://localhost:8000/api/v1/auth/register" \
+curl -X POST "http://localhost:8000/api/v1/users/register" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -144,7 +144,7 @@ curl -X POST "http://localhost:8000/api/v1/auth/register" \
 ### Login
 
 ```bash
-curl -X POST "http://localhost:8000/api/v1/auth/login" \
+curl -X POST "http://localhost:8000/api/v1/users/login" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=johndoe&password=securepassword"
 ```
@@ -163,6 +163,21 @@ Response:
 curl -X GET "http://localhost:8000/api/v1/matches/"
 ```
 
+Response:
+```json
+[
+  {
+    "external_id": 8183228,
+    "date": "2026-02-09T17:00:00Z",
+    "name": "Oilers vs Lørenskog",
+    "arena": "DNB Arena",
+    "id": 1,
+    "bookings_count": 0,
+    "is_full": false
+  }
+]
+```
+
 ### Create a Booking
 
 ```bash
@@ -170,6 +185,13 @@ curl -X POST "http://localhost:8000/api/v1/bookings/" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"match_id": 1}'
+```
+
+### Delete a User (Admin)
+
+```bash
+curl -X DELETE "http://localhost:8000/api/v1/users/1" \
+  -H "Authorization: Bearer ADMIN_ACCESS_TOKEN"
 ```
 
 ### Sync Matches (Admin)
@@ -185,15 +207,37 @@ curl -X POST "http://localhost:8000/api/v1/matches/sync" \
 puck-booking/
 ├── app/
 │   ├── core/           # Core functionality (config, database, security)
-│   ├── models/         # SQLAlchemy models
+│   ├── models/         # SQLAlchemy models (User, Match, Booking)
 │   ├── schemas/        # Pydantic schemas
 │   ├── crud/           # Database operations
-│   ├── routers/        # API endpoints
+│   ├── routers/        # API endpoints (users, matches, bookings)
 │   ├── services/       # External services (hockey API)
 │   └── main.py         # FastAPI application
+├── Dockerfile          # Docker build configuration
+├── docker-compose.yml  # Docker orchestration
+├── .dockerignore       # Docker build exclusions
 ├── requirements.txt    # Python dependencies
+├── .env.example        # Environment configuration template
+├── create_admin.py     # Admin user creation utility
 └── README.md          # This file
 ```
+
+## Database Schema
+
+### Match Model (Simplified)
+- `id`: Primary key
+- `external_id`: Unique ID from external API
+- `date`: Match date and time
+- `name`: Match name (e.g., "Oilers vs Lørenskog")
+- `arena`: Venue name (e.g., "DNB Arena")
+
+### User Model
+- `id`, `email`, `username`, `hashed_password`
+- `is_active`, `is_admin`, `created_at`
+
+### Booking Model
+- `id`, `user_id`, `match_id`, `created_at`
+- Unique constraint on (user_id, match_id)
 
 ## Configuration
 
@@ -208,6 +252,53 @@ Configuration is handled via environment variables or the `.env` file:
 - `ACCESS_TOKEN_EXPIRE_MINUTES`: Token expiration time
 - `HOCKEY_API_URL`: External hockey API endpoint
 - `MAX_BOOKINGS_PER_MATCH`: Maximum bookings per match (default: 2)
+- `CORS_ORIGINS`: Allowed CORS origins (comma-separated or "*")
+
+## Docker Deployment
+
+### Quick Start with Docker
+
+```bash
+# Build and run with docker-compose
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+```
+
+### Docker Commands
+
+```bash
+# Build the image
+docker build -t puck-booking:latest .
+
+# Run the container
+docker run -d \
+  -p 8000:8000 \
+  -e SECRET_KEY=your-secret-key \
+  -v $(pwd)/data:/app/data \
+  --name puck-booking \
+  puck-booking:latest
+
+# View logs
+docker logs -f puck-booking
+
+# Stop and remove
+docker stop puck-booking && docker rm puck-booking
+```
+
+### Production with PostgreSQL
+
+Uncomment the PostgreSQL service in `docker-compose.yml` and update the `DATABASE_URL`:
+
+```yaml
+# In docker-compose.yml, uncomment the db service
+# Then set DATABASE_URL:
+DATABASE_URL=postgresql://puckbooking:changeme@db:5432/puckbooking
+```
 
 ## Business Logic
 
