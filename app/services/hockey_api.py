@@ -1,7 +1,11 @@
 import httpx
+import logging
 from typing import List, Dict, Optional
 from datetime import datetime
 from app.core.config import settings
+
+# Set up logging
+logger = logging.getLogger(__name__)
 
 
 class HockeyAPIService:
@@ -25,10 +29,10 @@ class HockeyAPIService:
                     return [data]
                 return data if isinstance(data, list) else []
         except httpx.HTTPError as e:
-            print(f"Error fetching matches from external API: {e}")
+            logger.error(f"Error fetching matches from external API: {e}")
             return []
         except Exception as e:
-            print(f"Unexpected error: {e}")
+            logger.error(f"Unexpected error: {e}")
             return []
     
     def filter_valid_matches(self, matches: List[Dict]) -> List[Dict]:

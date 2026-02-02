@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from app.models.match import Match
 
 
@@ -21,7 +21,7 @@ def get_matches(db: Session, skip: int = 0, limit: int = 100) -> List[Match]:
 
 def get_upcoming_matches(db: Session, skip: int = 0, limit: int = 100) -> List[Match]:
     """Get upcoming matches only."""
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     return db.query(Match).filter(Match.date >= now).order_by(Match.date).offset(skip).limit(limit).all()
 
 
