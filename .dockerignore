@@ -1,0 +1,38 @@
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Database files
+*.db
+*.db-journal
+
+# Environment files
+.env
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker files (optional, only if not needed in build context)
+# Dockerfile
+# docker-compose.yml
+
+# Test files
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

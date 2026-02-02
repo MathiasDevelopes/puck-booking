@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.database import init_db
-from app.routers import auth, matches, bookings, admin
+from app.routers import users, matches, bookings
 
 # Initialize database
 init_db()
@@ -24,10 +24,9 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(auth.router, prefix=settings.API_V1_STR)
+app.include_router(users.router, prefix=settings.API_V1_STR)
 app.include_router(matches.router, prefix=settings.API_V1_STR)
 app.include_router(bookings.router, prefix=settings.API_V1_STR)
-app.include_router(admin.router, prefix=settings.API_V1_STR)
 
 
 @app.get("/")

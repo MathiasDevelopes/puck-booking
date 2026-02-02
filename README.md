@@ -18,6 +18,7 @@ This is a FastAPI-based backend API for booking hockey matches at DNB Arena. The
 - **Booking System**: Book matches with automatic validation (max 2 per match)
 - **Admin Functions**: Manage users and bookings
 - **Auto-generated API Documentation**: Available at `/docs` (Swagger UI)
+- **Docker Support**: Easy deployment with Docker and docker-compose
 
 ## Tech Stack
 
@@ -27,15 +28,40 @@ This is a FastAPI-based backend API for booking hockey matches at DNB Arena. The
 - **JWT**: Token-based authentication
 - **Pydantic**: Data validation using Python type annotations
 - **httpx**: Async HTTP client for external API calls
+- **Docker**: Containerization for easy deployment
 
 ## Installation
 
-### Prerequisites
+### Option 1: Docker (Recommended for Production)
+
+1. Clone the repository:
+```bash
+git clone https://github.com/MathiasDevelopes/puck-booking.git
+cd puck-booking
+```
+
+2. Create a `.env` file for configuration:
+```env
+SECRET_KEY=your-super-secret-key-change-this-in-production
+CORS_ORIGINS=*
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+```
+
+3. Run with docker-compose:
+```bash
+docker-compose up -d
+```
+
+The API will be available at http://localhost:8000
+
+### Option 2: Local Development
+
+#### Prerequisites
 
 - Python 3.8 or higher
 - pip
 
-### Setup
+#### Setup
 
 1. Clone the repository:
 ```bash
@@ -63,9 +89,14 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 
 ## Running the Application
 
-Start the development server:
+### Development Server
 ```bash
 uvicorn app.main:app --reload
+```
+
+### Production with Docker
+```bash
+docker-compose up -d
 ```
 
 The API will be available at:
@@ -75,11 +106,12 @@ The API will be available at:
 
 ## API Endpoints
 
-### Authentication
+### Users
 
-- `POST /api/v1/auth/register` - Register a new user
-- `POST /api/v1/auth/login` - Login and get JWT token
-- `GET /api/v1/auth/me` - Get current user info (requires auth)
+- `POST /api/v1/users/register` - Register a new user
+- `POST /api/v1/users/login` - Login and get JWT token
+- `GET /api/v1/users/me` - Get current user info (requires auth)
+- `DELETE /api/v1/users/{user_id}` - Delete a user (admin only)
 
 ### Matches
 
@@ -94,10 +126,6 @@ The API will be available at:
 - `GET /api/v1/bookings/match/{match_id}` - Get bookings for a specific match
 - `DELETE /api/v1/bookings/{booking_id}` - Delete a booking
 - `GET /api/v1/bookings/` - List all bookings (admin only)
-
-### Admin
-
-- `DELETE /api/v1/admin/users/{user_id}` - Delete a user (admin only)
 
 ## Usage Examples
 

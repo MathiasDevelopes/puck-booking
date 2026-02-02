@@ -53,25 +53,19 @@ class HockeyAPIService:
         home_team = external_match.get("homeTeam", {})
         away_team = external_match.get("awayTeam", {})
         venue = external_match.get("venue", {})
-        tournament = external_match.get("tournament", {})
         
         # Parse the date string to datetime
         date_str = external_match.get("date", "")
         match_date = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
         
+        # Create match name from teams
+        match_name = f"{home_team.get('shortName', 'Home')} vs {away_team.get('shortName', 'Away')}"
+        
         return {
             "external_id": external_match.get("id"),
             "date": match_date,
-            "home_team_id": home_team.get("id"),
-            "home_team_full_name": home_team.get("fullName"),
-            "home_team_short_name": home_team.get("shortName"),
-            "away_team_id": away_team.get("id"),
-            "away_team_full_name": away_team.get("fullName"),
-            "away_team_short_name": away_team.get("shortName"),
-            "venue_name": venue.get("name"),
-            "status": external_match.get("status"),
-            "tournament_id": str(tournament.get("id")),
-            "tournament_name": tournament.get("name"),
+            "name": match_name,
+            "arena": venue.get("name", "Unknown Arena"),
         }
     
     async def get_valid_matches_for_sync(self) -> List[Dict]:
